@@ -3,18 +3,20 @@ const Api = (() => {
   const URL = "http://localhost:3000";
   const PATH = "todos";
 
-  const getTodos = () => {
-    return fetch(`${URL}/${PATH}`).then(res => res.json());
+  const getTodos = async () => {
+    const res = await fetch(`${URL}/${PATH}`);
+    return await res.json();
   };
 
-  const addTodo = todo => {
-    return fetch(`${URL}/${PATH}`, {
+  const addTodo = async todo => {
+    const res = await fetch(`${URL}/${PATH}`, {
       method: "POST",
       body: JSON.stringify(todo),
       headers: {
         "Content-type": "application/json; charset=UTF-8"
       }
-    }).then(res => res.json());
+    });
+    return await res.json();
   };
 
   const deleteToDo = id =>
@@ -31,7 +33,7 @@ const Api = (() => {
       }
     });
 
-  return { getTodos, addTodo, deleteToDo };
+  return { getTodos, addTodo, deleteToDo, updateToDo };
 })();
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ VIEW ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -50,7 +52,7 @@ const View = (() => {
   const createPending = arr => {
     return [...arr].reduce((acc, curr) => {
       acc += `
-        <li class=${curr.isCompleted}>${curr.content}</li>
+        <li class='task__to__do' id=${curr.isCompleted}>${curr.content}</li>
         <button>edit</button>
         <button id=${curr.id}>X</button>
         <button>completed</button>
@@ -110,18 +112,19 @@ const Controller = ((model, view) => {
 
   const addTodo = () => {
     const input = document.querySelector(".todo__input");
-    const form = document.querySelector(".input__container");
-    const submitBtn = document.querySelector(".submit__task__button");
+    const btn = document.querySelector(".submit__task__button");
 
-    input.addEventListener("keyup", ev => {
-      let result = "";
-      result += ev.target.value;
-      if (ev.key === "Enter") {
-        const newtodo = new model.Todo(result);
+    input.addEventListener("input", ev => {
+      ev.preventDefault();
+      //EV.TARGET.VALUE DOES COME IN AS A STRING
+      console.log("EV:", ev.target.value);
+      //BROKE MY ADD EVENT LISTENER
+      if (ev.type === "ENTER") {
+        const newtodo = new model.Todo(ev.target.value);
         model.addTodo(newtodo).then(todo => {
+          console.log("TODOOOOOO:", todo);
           state.pending = [todo, ...state.pending];
         });
-        ev.target.value = "";
       }
     });
   };
@@ -135,7 +138,9 @@ const Controller = ((model, view) => {
     });
   };
 
-  const updateToDo = id => {};
+  const updateToDo = id => {
+    const li = document.querySelector(".task__to__do");
+  };
 
   const init = () => {
     model.getTodos().then(todos => {

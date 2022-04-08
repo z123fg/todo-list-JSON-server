@@ -38,17 +38,18 @@ body {
   display: flex;
   flex-direction: column;
   align-content: center;
-  /* width: 50%; */
-  /* margin: 15px; */
   border: solid 1px black;
   list-style-type: none;
 }
 
-.tasks .pending {
-  display: flex;
-  flex-direction: row;
-}
-
 .false {
   background-color: red;
+}
+
+.pending__tasks > * {
+  margin: 5px;
+  padding: 5px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
 }
