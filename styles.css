@@ -1,0 +1,54 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  background-image: linear-gradient(120deg, #dfc05a, #d88771);
+  color: white;
+}
+
+.primary__header {
+  display: flex;
+  justify-content: center;
+}
+
+.main__container {
+  display: flex;
+  justify-content: center;
+}
+
+.submit__task__button {
+  background-color: rgb(106, 139, 248);
+  border-radius: 3px;
+  color: white;
+}
+
+.tasks__container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  border: solid 3px black;
+  width: 100vw;
+}
+
+.tasks__container ul {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  /* width: 50%; */
+  /* margin: 15px; */
+  border: solid 1px black;
+  list-style-type: none;
+}
+
+.tasks .pending {
+  display: flex;
+  flex-direction: row;
+}
+
+.false {
+  background-color: red;
+}
