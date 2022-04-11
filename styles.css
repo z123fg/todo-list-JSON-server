@@ -28,10 +28,19 @@ body {
 
 .tasks__container {
   display: flex;
-  flex-direction: row;
+}
+
+.pending_tasks__container {
+  display: flex;
+  flex-direction: column;
   justify-content: space-around;
   border: solid 3px black;
-  width: 100vw;
+  width: 47vw;
+  margin: 10px
+}
+.tasks {
+  display: flex;
+  flex-direction: column;
 }
 
 .tasks__container ul {
@@ -46,10 +55,41 @@ body {
   background-color: red;
 }
 
-.pending__tasks > * {
+.pending__tasks {
   margin: 5px;
   padding: 5px;
   border-radius: 5px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  width: 45vw;
+  list-style-type: none;
+}
+
+.task__to__do{
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  background-color: lightgray;
+  margin: 10px;
+  padding:5px;
+}
+
+.task__to__do li {
+  height: 2rem;
+  margin: 10px;
+  flex: 1;
+}
+
+.task__to__do button {
+  height: 2rem;
+  margin: 2px;
+}
+
+.material-icons-outlined {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
 }

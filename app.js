@@ -52,10 +52,18 @@ const View = (() => {
   const createPending = arr => {
     return [...arr].reduce((acc, curr) => {
       acc += `
-        <li class='task__to__do' id=${curr.isCompleted}>${curr.content}</li>
-        <button>edit</button>
-        <button id=${curr.id}>X</button>
-        <button>completed</button>
+      <div class="task__to__do">
+        <li id=${curr.isCompleted}>${curr.content}</li>
+        <button><span class="material-icons-outlined">
+        edit
+        </span></button>
+        <button class=${curr.id}><span class="material-icons-outlined" id=${curr.id}>
+        delete
+        </span></button>
+        <button><span class="material-icons-outlined">
+        chevron_right
+        </span></button>
+      </div>
         `;
       return acc;
     }, "");
@@ -114,27 +122,24 @@ const Controller = ((model, view) => {
     const input = document.querySelector(".todo__input");
     const btn = document.querySelector(".submit__task__button");
 
-    input.addEventListener("input", ev => {
-      ev.preventDefault();
-      //EV.TARGET.VALUE DOES COME IN AS A STRING
-      console.log("EV:", ev.target.value);
-      //BROKE MY ADD EVENT LISTENER
-      if (ev.type === "ENTER") {
-        const newtodo = new model.Todo(ev.target.value);
+
+    btn.addEventListener("click", ev => {
+        const newtodo = new model.Todo(input.value);
         model.addTodo(newtodo).then(todo => {
           console.log("TODOOOOOO:", todo);
           state.pending = [todo, ...state.pending];
         });
-      }
+      // }
     });
   };
 
   const deleteToDo = () => {
-    const container = document.querySelector(".tasks");
-
+    const container = document.querySelector(".tasks__container");
+    
     container.addEventListener("click", ev => {
-      state.pending = state.pending.filter(todo => +todo.id !== +ev.target.id);
-      model.deleteToDo(ev.target.id);
+      ev.preventDefault()
+        state.pending = state.pending.filter(todo => +todo.id !== +ev.target.id);
+        model.deleteToDo(ev.target.id);
     });
   };
 
