@@ -54,7 +54,7 @@ const View = (() => {
       acc += `
       <div class="task__to__do">
         <li id=${curr.isCompleted}>${curr.content}</li>
-        <button><span class="material-icons-outlined">
+        <button class='edit__btn'><span class="material-icons-outlined">
         edit
         </span></button>
         <button class=${curr.id}><span class="material-icons-outlined" id=${curr.id}>
@@ -119,6 +119,7 @@ const Controller = ((model, view) => {
   const state = new Model.State();
 
   const addTodo = () => {
+    console.log("ADD")
     const input = document.querySelector(".todo__input");
     const btn = document.querySelector(".submit__task__button");
 
@@ -134,18 +135,29 @@ const Controller = ((model, view) => {
   };
 
   const deleteToDo = () => {
+    console.log("DELETE")
     const container = document.querySelector(".tasks__container");
     
     container.addEventListener("click", ev => {
-      ev.preventDefault()
-        state.pending = state.pending.filter(todo => +todo.id !== +ev.target.id);
-        model.deleteToDo(ev.target.id);
+      ev.preventDefault();
+      state.pending = state.pending.filter(todo => {
+          if(ev.target.className === 'material-icons-outlined' && +todo.id !== +ev.target.id){
+        return +todo.id !== +ev.target.id
+      }
+      model.deleteToDo(ev.target.id);
+        });
     });
   };
 
   const updateToDo = id => {
-    const li = document.querySelector(".task__to__do");
-  };
+      const editBtn = document.querySelector(".material-icons-outlined");
+      console.log("EDIT")
+        editBtn.addEventListener('click', ev => {
+          console.log("EV: " , ev)
+        })
+      // }
+      return null;
+  }
 
   const init = () => {
     model.getTodos().then(todos => {
@@ -157,6 +169,7 @@ const Controller = ((model, view) => {
     init();
     addTodo();
     deleteToDo();
+    updateToDo();
   };
   return { bootstrap };
 })(Model, View);
