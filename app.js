@@ -8,20 +8,20 @@ const Api = (() => {
     return await res.json();
   };
 
-  const addTodo = async todo => {
+  const addTodo = async (todo) => {
     const res = await fetch(`${URL}/${PATH}`, {
       method: "POST",
       body: JSON.stringify(todo),
       headers: {
-        "Content-type": "application/json; charset=UTF-8"
-      }
+        "Content-type": "application/json; charset=UTF-8",
+      },
     });
     return await res.json();
   };
 
-  const deleteToDo = id =>
-    fetch(`${URL}/${PATH}/${id}`, {
-      method: "DELETE"
+  const deleteToDo = async(id) =>
+    await fetch(`${URL}/${PATH}/${id}`, {
+      method: "DELETE",
     });
 
   const updateToDo = (todo, id) =>
@@ -29,8 +29,8 @@ const Api = (() => {
       method: "PUT",
       body: JSON.stringify(todo),
       headers: {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     });
 
   return { getTodos, addTodo, deleteToDo, updateToDo };
@@ -38,26 +38,24 @@ const Api = (() => {
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ VIEW ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 const View = (() => {
-  const domClassStr = {
-    inputbox: document.querySelector(".todo__input"),
-    submitButton: document.querySelector(".submit__task__button"),
-    pendingTasksUL: document.querySelector(".pending__tasks"),
-    completedTasksUL: document.querySelector(".completed__tasks")
-  };
 
   const render = (elem, tmp) => {
     elem.innerHTML = tmp;
   };
 
-  const createPending = arr => {
+  const createPending = (arr) => {
     return [...arr].reduce((acc, curr) => {
       acc += `
-      <div class="task__to__do">
-        <li id=${curr.isCompleted}>${curr.content}</li>
+      <div class="task__to__do" id=${curr.id}>
+        <li id=false class="content">${
+        curr.content
+      }</li>
         <button class='edit__btn'><span class="material-icons-outlined">
         edit
         </span></button>
-        <button class=${curr.id}><span class="material-icons-outlined" id=${curr.id}>
+        <button class=${
+          curr.id
+        } id="deleteBtn"><span class="material-icons-outlined" id=${curr.id}>
         delete
         </span></button>
         <button><span class="material-icons-outlined">
@@ -69,36 +67,68 @@ const View = (() => {
     }, "");
   };
 
+  const createCompleted = (arr) => {
+    return [...arr].reduce((acc, curr) => {
+      acc += `
+      <div class="task__completed" id=true>
+      <li id=${curr.id} class="content">${
+        curr.content
+      }</li>
+        <button class='edit__btn'><span class="material-icons-outlined">
+        edit
+        </span></button>
+        <button class=${
+          curr.id
+        } id="deleteBtn"><span class="material-icons-outlined" id=${curr.id}>
+        delete
+        </span></button>
+      </div>
+        `;
+      return acc;
+    }, "");
+  }
   return {
     render,
     createPending,
-    domClassStr
+    createCompleted,
   };
 })();
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ MODEL ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 const Model = ((api, view) => {
   class Todo {
-    constructor(todo) {
+    constructor(todo, isCompleted) {
       this.content = todo;
-      this.isCompleted = false;
+      this.isCompleted = isCompleted;
     }
   }
 
   class State {
     #pending = [];
+    #completed = [];
 
     get pending() {
       return this.#pending;
     }
+    get completed() {
+      return this.#completed;
+    }
+
     set pending(newtodo) {
       this.#pending = [...newtodo];
 
-      const container = document.querySelector(".pending__tasks");
-      const tmp = view.createPending(this.#pending);
+          const container = document.querySelector('.pending__tasks');
+          const tmp = view.createPending(this.#pending);
+          view.render(container, tmp);
+      }
+    set completed(todo) {
+      this.#completed = [...todo];
 
-      view.render(container, tmp);
+      const container = document.querySelector('.completed__tasks');
+      const tmp = view.createCompleted(this.#completed);
+      view.render(container, tmp)
     }
+    
   }
 
   const getTodos = api.getTodos;
@@ -110,60 +140,75 @@ const Model = ((api, view) => {
     addTodo,
     deleteToDo,
     State,
-    Todo
+    Todo,
   };
 })(Api, View);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ CONTROLLER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 const Controller = ((model, view) => {
   const state = new Model.State();
-
+  
+  const init = () => {
+    model.getTodos().then((todos) => {
+      let pend = [];
+      let comp = [];
+      for(let i = 0; i < todos.length; i++){
+        let todo = todos[i];
+        if(todo.isCompleted){
+          comp.push(todo)
+        } else {
+          pend.push(todo)
+        }
+      }
+      state.pending = pend;
+      state.completed = comp;
+    });
+  };
+  
   const addTodo = () => {
-    console.log("ADD")
     const input = document.querySelector(".todo__input");
     const btn = document.querySelector(".submit__task__button");
-
-
-    btn.addEventListener("click", ev => {
-        const newtodo = new model.Todo(input.value);
-        model.addTodo(newtodo).then(todo => {
-          console.log("TODOOOOOO:", todo);
-          state.pending = [todo, ...state.pending];
-        });
-      // }
+    
+    btn.addEventListener("click", (ev) => {
+      const newtodo = new model.Todo(input.value, false);
+      model.addTodo(newtodo).then((todo) => {
+        state.pending = [todo, ...state.pending];
+      });
     });
   };
 
   const deleteToDo = () => {
-    console.log("DELETE")
-    const container = document.querySelector(".tasks__container");
+    console.log("DELETE");
+    const container = document.querySelector(".pending__tasks");
+    let id = {};
+
+    console.log(container)
     
-    container.addEventListener("click", ev => {
-      ev.preventDefault();
-      state.pending = state.pending.filter(todo => {
-          if(ev.target.className === 'material-icons-outlined' && +todo.id !== +ev.target.id){
-        return +todo.id !== +ev.target.id
-      }
+    
+    // const deleteBtn = document.querySelector("#deleteBtn");
+    // console.log(deleteBtn.id)
+
+    container.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      // [...ev.path].forEach(el => console.log(el))
+      let id = state.pending = state.pending.filter((todo) => {
+        +todo.id !== +ev.target.id;
+      });
       model.deleteToDo(ev.target.id);
-        });
     });
   };
 
-  const updateToDo = id => {
-      const editBtn = document.querySelector(".material-icons-outlined");
-      console.log("EDIT")
-        editBtn.addEventListener('click', ev => {
-          console.log("EV: " , ev)
-        })
-      // }
-      return null;
-  }
+  const updateToDo = () => {
+    let result = "";
+    const task = document.querySelector(".tasks__container");
 
-  const init = () => {
-    model.getTodos().then(todos => {
-      state.pending = todos;
+    task.querySelector("click", (ev) => {
+      ev.preventDefault();
+      console.log("CLICK")
     });
+    return null;
   };
+
 
   const bootstrap = () => {
     init();
