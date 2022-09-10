@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>todo-list</title>
+  <script async src="script.js"></script>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <input class="todolist__input">
+      <button class="todolist__submit">submit</button>
+    </div>
+
+    <div class="lists">
+      <section class="first-list-group">
+        <header>Pending Tasks</header>
+        <ul id="pending-tasks-list">
+          <li id="123">
+            <span>pending task one</span>
+            <div class="pending-button-group">
+              <button class="edit-button">edit</button>
+              <button class="delete-button">delete</button>
+              <button class="compeleted-button">complete</button>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section class="second-list-group">
+        <header>Completed Tasks</header>
+        <ul id="Completed-tasks-list">
+          <li>
+            <span>completed</span>
+            <div class="completed-button-group">
+              <button class="edit-button">edit</button>
+              <button class="delete-button">delete</button>
+              <button class="unfinish-button">unfinish</button>
+            </div>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </div>
+
+</body>
+
+</html>
